@@ -3,12 +3,13 @@ package main
 import (
 	"LOL-Assistant/disocrd"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -16,6 +17,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Gemini 클라이언트 초기화
+	disocrd.Initialize()
 
 	token := fmt.Sprintf("Bot %s", os.Getenv("BOT_TOKEN"))
 	dg, err := discordgo.New(token)
