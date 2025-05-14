@@ -2,9 +2,11 @@ package gemini
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -48,6 +50,36 @@ func NewGeminiClient() ChatSession {
 		},
 	}
 
+	files, err := os.ReadDir("pdfs")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var names []string
+	for _, file := range files {
+		if !file.IsDir() {
+			names = append(names, file.Name())
+		}
+	}
+
+	for _, name := range names {
+		wikiData, err := os.ReadFile(fmt.Sprintf("pdfs/%s", name))
+		if err != nil {
+			log.Fatal(err)
+		}
+		wikiMimeType := http.DetectContentType(wikiData)
+
+		ChatHistory = append(ChatHistory, &genai.Content{
+			Parts: []genai.Part{
+				genai.Blob{
+					MIMEType: wikiMimeType,
+					Data:     wikiData,
+				},
+			},
+			Role: "model",
+		})
+	}
+
 	cs := model.StartChat()
 
 	return ChatSession{
@@ -55,12 +87,12 @@ func NewGeminiClient() ChatSession {
 	}
 }
 
-func (cs ChatSession) ChatWithDiscord(ctx context.Context, text string) string {
+func (cs ChatSession) ChatWithDiscord(ctx context.Context, text string) (string, error) {
 	cs.ChatSesstion.History = ChatHistory
 
 	resp, err := cs.ChatSesstion.SendMessage(ctx, genai.Text(text))
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	var content genai.Part
@@ -85,5 +117,5 @@ func (cs ChatSession) ChatWithDiscord(ctx context.Context, text string) string {
 		Role: "model",
 	})
 
-	return string(content.(genai.Text))
+	return string(content.(genai.Text)), nil
 }
