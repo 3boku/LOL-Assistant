@@ -58,5 +58,7 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 			log.Println("메세지 삭제 실패", err)
 			return
 		}
+	} else if strings.HasPrefix(m.Content, "내가 마지막으로 플레이한 게임을 분석해줘") {
+
 	}
 }
