@@ -7,3 +7,8 @@ go get -u github.com/google/generative-ai-go
 go get -u github.com/joho/godotenv
 ```
 
+## riot games open api
+[링크](https://developer.riotgames.com/apis)
+
+## discord bot
+[링크](https://discord.com/developers/applications)
