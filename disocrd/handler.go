@@ -3,26 +3,60 @@ package disocrd
 import (
 	"LOL-Assistant/gemini"
 	"context"
-	"github.com/bwmarrin/discordgo"
 	"log"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
 )
+
+// 전역 변수로 Gemini 클라이언트 선언
+var geminiClient gemini.ChatSession
+
+// Initialize 함수 추가 - 봇 시작 시 한 번만 호출
+func Initialize() {
+	geminiClient = gemini.NewGeminiClient()
+}
 
 func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
 
-	cs := gemini.NewGeminiClient()
-
-	resp := cs.ChatWithDiscord(context.Background(), m.Content)
-
 	if strings.Contains(m.Content, "디코봇아") {
+		delMsg, err := s.ChannelMessageSend(m.ChannelID, "답변을 생성하고 있어요")
+		if err != nil {
+			log.Println("답변을 생성하고 있어요 실패", err)
+			return
+		}
+
+		resp, err := geminiClient.ChatWithDiscord(context.Background(), m.Content)
+		if err != nil {
+			_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
+			if sendErr != nil {
+				log.Fatalln("답변생성 실패", err)
+				return
+			}
+			log.Println("gemini api 에러", err)
+			return
+		}
+
 		msg, err := s.ChannelMessageSend(m.ChannelID, resp)
 		if err != nil {
-			log.Println(err)
+			_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
+			if sendErr != nil {
+				log.Fatalln("답변생성 실패", err)
+				return
+			}
+			log.Println("gemini api 에러", err)
+			return
 		} else {
 			log.Println(msg)
+		}
+
+		err = s.ChannelMessageDelete(m.ChannelID, delMsg.ID)
+		if err != nil {
+			log.Println("메세지 삭제 실패", err)
+			return
 		}
 	}
 }
