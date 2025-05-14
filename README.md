@@ -4,5 +4,6 @@
 ```shell
 go get -u github.com/bwmarrin/discordgo
 go get -u github.com/google/generative-ai-go
+go get -u github.com/joho/godotenv
 ```
 

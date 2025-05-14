@@ -4,6 +4,8 @@ import (
 	"LOL-Assistant/gemini"
 	"context"
 	"github.com/bwmarrin/discordgo"
+	"log"
+	"strings"
 )
 
 func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -15,7 +17,12 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	resp := cs.ChatWithDiscord(context.Background(), m.Content)
 
-	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, resp)
+	if strings.Contains(m.Content, "디코봇아") {
+		msg, err := s.ChannelMessageSend(m.ChannelID, resp)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Println(msg)
+		}
 	}
 }
