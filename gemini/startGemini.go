@@ -27,7 +27,7 @@ func NewGeminiClient() ChatSession {
 	}
 
 	instructions := os.Getenv("GEMINI_INSTRUCTIONS")
-	model := client.GenerativeModel("gemini-2.0-flash")
+	model := client.GenerativeModel("gemini-2.5-flash-preview-04-17")
 	model.SystemInstruction = &genai.Content{
 		Parts: []genai.Part{genai.Text(instructions)},
 	}
