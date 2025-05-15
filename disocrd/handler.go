@@ -101,7 +101,7 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 				return
 			}
 		}
-		matchReq := fmt.Sprintf("%s | 나의 puuid: %s, 게임정보: %s", split[0], puuid, gameInfo)
+		matchReq := fmt.Sprintf("%s | 나의 puuid: %s, 게임정보: %s", m.Content, puuid, gameInfo)
 
 		resp, err := geminiClient.ChatWithDiscord(context.Background(), matchReq)
 		if err != nil {
