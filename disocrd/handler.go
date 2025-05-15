@@ -83,7 +83,7 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 		nickName := strings.Split(split[1], "#")[0]
 		tag := strings.Split(split[1], "#")[1]
 
-		gameInfo, err := league.GetMatch(nickName, tag)
+		gameInfo, puuid, err := league.GetMatch(nickName, tag)
 		if err != nil {
 			if err != nil {
 				// 응답 전송 실패 시 에러 메시지 전송
@@ -101,7 +101,7 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 				return
 			}
 		}
-		matchReq := fmt.Sprintf("%s %s", split[0], gameInfo)
+		matchReq := fmt.Sprintf("%s | 나의 puuid: %s, 게임정보: %s", split[0], puuid, gameInfo)
 
 		resp, err := geminiClient.ChatWithDiscord(context.Background(), matchReq)
 		if err != nil {
