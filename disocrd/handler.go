@@ -94,31 +94,6 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 				log.Println("gemini api 에러", err)
 				return
-			} else {
-				matchReq := fmt.Sprintf("%s %s", split[0], gameInfo)
-
-				resp, err := geminiClient.ChatWithDiscord(context.Background(), matchReq)
-				if err != nil {
-					// 응답 생성 실패 시 에러 메시지 전송
-					_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
-					if sendErr != nil {
-						log.Fatalln("답변생성 실패", err)
-						return
-					}
-					log.Println("gemini api 에러", err)
-					return
-				}
-
-				_, err = s.ChannelMessageSend(m.ChannelID, resp)
-				if err != nil {
-					_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
-					if sendErr != nil {
-						log.Fatalln("답변생성 실패", err)
-						return
-					}
-					log.Println("gemini api 에러", err)
-					return
-				}
 			}
 			err = s.ChannelMessageDelete(m.ChannelID, delMsg.ID)
 			if err != nil {
@@ -126,6 +101,35 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 				return
 			}
 		}
+		matchReq := fmt.Sprintf("%s %s", split[0], gameInfo)
 
+		resp, err := geminiClient.ChatWithDiscord(context.Background(), matchReq)
+		if err != nil {
+			// 응답 생성 실패 시 에러 메시지 전송
+			_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
+			if sendErr != nil {
+				log.Fatalln("답변생성 실패", err)
+				return
+			}
+			log.Println("gemini api 에러", err)
+			return
+		}
+		log.Println(resp)
+
+		_, err = s.ChannelMessageSend(m.ChannelID, resp)
+		if err != nil {
+			_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
+			if sendErr != nil {
+				log.Fatalln("답변생성 실패", err)
+				return
+			}
+			log.Println("gemini api 에러", err)
+			return
+		}
+		err = s.ChannelMessageDelete(m.ChannelID, delMsg.ID)
+		if err != nil {
+			log.Println("메세지 삭제 실패", err)
+			return
+		}
 	}
 }
