@@ -2,7 +2,9 @@ package disocrd
 
 import (
 	"LOL-Assistant/gemini"
+	"LOL-Assistant/league"
 	"context"
+	"fmt"
 	"log"
 	"strings"
 
@@ -35,7 +37,6 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 			log.Println("답변을 생성하고 있어요 실패", err)
 			return
 		}
-
 		// Gemini AI로 사용자 메시지에 대한 응답 생성
 		resp, err := geminiClient.ChatWithDiscord(context.Background(), m.Content)
 		if err != nil {
@@ -71,6 +72,60 @@ func Message(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 	} else if strings.HasPrefix(m.Content, "내가 마지막으로 플레이한 게임을 분석해줘") {
-		// 게임 분석 기능 구현 예정
+		// ex: "내가 마지막으로 플레이한 게임을 분석해줘|닉네임#태그
+		delMsg, err := s.ChannelMessageSend(m.ChannelID, "답변을 생성하고 있어요")
+		if err != nil {
+			log.Println("답변을 생성하고 있어요 실패", err)
+			return
+		}
+
+		split := strings.Split(m.Content, "|")
+		nickName := strings.Split(split[1], "#")[0]
+		tag := strings.Split(split[1], "#")[1]
+
+		gameInfo, err := league.GetMatch(nickName, tag)
+		if err != nil {
+			if err != nil {
+				// 응답 전송 실패 시 에러 메시지 전송
+				_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
+				if sendErr != nil {
+					log.Fatalln("답변생성 실패", err)
+					return
+				}
+				log.Println("gemini api 에러", err)
+				return
+			} else {
+				matchReq := fmt.Sprintf("%s %s", split[0], gameInfo)
+
+				resp, err := geminiClient.ChatWithDiscord(context.Background(), matchReq)
+				if err != nil {
+					// 응답 생성 실패 시 에러 메시지 전송
+					_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
+					if sendErr != nil {
+						log.Fatalln("답변생성 실패", err)
+						return
+					}
+					log.Println("gemini api 에러", err)
+					return
+				}
+
+				_, err = s.ChannelMessageSend(m.ChannelID, resp)
+				if err != nil {
+					_, sendErr := s.ChannelMessageSend(m.ChannelID, "답변을 생성하지 못했어요")
+					if sendErr != nil {
+						log.Fatalln("답변생성 실패", err)
+						return
+					}
+					log.Println("gemini api 에러", err)
+					return
+				}
+			}
+			err = s.ChannelMessageDelete(m.ChannelID, delMsg.ID)
+			if err != nil {
+				log.Println("메세지 삭제 실패", err)
+				return
+			}
+		}
+
 	}
 }
