@@ -57,5 +57,10 @@ func main() {
 	<-sc
 
 	// 디스코드 연결 종료
-	dg.Close()
+	defer func() {
+		err = dg.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 }

@@ -17,7 +17,12 @@ func GetMatch(name, tag string) (map[string]interface{}, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err = resp.Body.Close()
+		if err != nil {
+			fmt.Println("error closing body", err)
+		}
+	}()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -38,7 +43,12 @@ func GetMatch(name, tag string) (map[string]interface{}, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err = resp.Body.Close()
+		if err != nil {
+			fmt.Println("error closing body", err)
+		}
+	}()
 
 	respBody, err = io.ReadAll(resp.Body)
 	if err != nil {
@@ -58,7 +68,12 @@ func GetMatch(name, tag string) (map[string]interface{}, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err = resp.Body.Close()
+		if err != nil {
+			fmt.Println("error closing body", err)
+		}
+	}()
 
 	respBody, err = io.ReadAll(resp.Body)
 	if err != nil {
