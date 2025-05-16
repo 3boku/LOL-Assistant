@@ -3,7 +3,7 @@ package league
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -19,7 +19,7 @@ func GetMatch(name, tag string) (map[string]interface{}, string, error) {
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", err
 	}
@@ -40,7 +40,7 @@ func GetMatch(name, tag string) (map[string]interface{}, string, error) {
 	}
 	defer resp.Body.Close()
 
-	respBody, err = ioutil.ReadAll(resp.Body)
+	respBody, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", err
 	}
@@ -60,7 +60,7 @@ func GetMatch(name, tag string) (map[string]interface{}, string, error) {
 	}
 	defer resp.Body.Close()
 
-	respBody, err = ioutil.ReadAll(resp.Body)
+	respBody, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", err
 	}
