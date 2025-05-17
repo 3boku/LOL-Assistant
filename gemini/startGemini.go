@@ -13,7 +13,7 @@ import (
 
 // ChatSession 구조체는 Gemini AI와의 채팅 세션을 관리합니다.
 type ChatSession struct {
-	ChatSesstion *genai.ChatSession
+	ChatSession *genai.ChatSession
 }
 
 // ChatHistory는 채팅 기록을 저장하는 전역 변수입니다.
@@ -104,7 +104,7 @@ func NewGeminiClient() ChatSession {
 
 	// ChatSession 객체 반환
 	return ChatSession{
-		ChatSesstion: cs,
+		ChatSession: cs,
 	}
 }
 
@@ -113,10 +113,10 @@ func NewGeminiClient() ChatSession {
 // 오류가 발생하면 빈 문자열과 오류를 반환합니다.
 func (cs ChatSession) ChatWithDiscord(ctx context.Context, text string) (string, error) {
 	// 현재 채팅 세션에 대화 기록 설정
-	cs.ChatSesstion.History = ChatHistory
+	cs.ChatSession.History = ChatHistory
 
 	// Gemini AI에 메시지 전송
-	resp, err := cs.ChatSesstion.SendMessage(ctx, genai.Text(text))
+	resp, err := cs.ChatSession.SendMessage(ctx, genai.Text(text))
 	if err != nil {
 		return "", err
 	}
